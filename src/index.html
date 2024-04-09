@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <title>Telegram</title>
+    <link rel="stylesheet" href="./assets/css/output.css">
+</head>
+
+<body>
+
+    <div id="app">
+
+        <!-- main container -->
+        <div class="w-screen h-screen flex">
+            <!-- left section -->
+            <div class="w-1/4 border-r">
+                <div class="h-28">
+                    <!-- search section -->
+                    <div class="w-full p-4 flex items-center">
+
+                        <i class="mr-4 text-2xl text-gray-500 fa-solid fa-bars cursor-pointer"></i>
+
+                        <div class="w-full relative">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+
+                                <svg class="w-4 h-4 text-gray-300 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
+
+                            </div>
+                            <input type="search" id="default-search"
+                                class="w-full p-2 ps-10 text-sm bg-slate-100 rounded-3xl text-gray-700 placeholder:text-gray-300 placeholder:font-semibold"
+                                placeholder="Search..." />
+                        </div>
+                    </div>
+
+                    <!-- chat folders -->
+                    <div class="shadow-md">
+                        <ul @wheel="horizontalScroll($event)" class="ml-2 flex items-center overflow-x-auto overflow-y-hidden whitespace-nowrap
+                        no-scrollbar font-semibold snap-x">
+                            <li class="p-2 snap-start">
+                                <a href="#">
+                                    <span class="text-gray-500">All</span>
+                                    <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">61</span>
+                                </a>
+                            </li>
+                            <li class="ml- p-2 snap-start">
+                                <a href="#">
+                                    <span class="text-gray-500">Home</span>
+                                    <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">5</span>
+                                </a>
+                            </li>
+                            <li class="ml- p-2 snap-start">
+                                <a href="#">
+                                    <span class="text-gray-500">People</span>
+                                    <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">8</span>
+                                </a>
+                            </li>
+                            <li class="ml- p-2 snap-start">
+                                <a href="#">
+                                    <span class="text-gray-500">News</span>
+                                    <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">3</span>
+                                </a>
+                            </li>
+                            <li class="ml- p-2 snap-start">
+                                <a href="#">
+                                    <span class="text-gray-500">Meme</span>
+                                    <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">24</span>
+                                </a>
+                            </li>
+                            <li class="ml- p-2 snap-start">
+                                <a href="#">
+                                    <span class="text-gray-500">Geopolitics</span>
+                                    <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">17</span>
+                                </a>
+                            </li>
+                            <li class="ml- p-2 snap-start">
+                                <a href="#">
+                                    <span class="text-gray-500">Utils</span>
+                                    <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">4</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- chat container -->
+                <div class="h-[calc(100vh-7rem)] overflow-y-auto">
+                    <!-- chats -->
+                    <ul class="p-4 flex flex-col gap-4 ">
+
+                        <template v-for="contact, index in contacts">
+                            <li @click="showCurrentChat(index)" class="flex items-center cursor-pointer">
+                                <!-- profile img -->
+                                <img class="w-12 h-12 rounded-full" :src="getProfilePicture(index)" alt="">
+                                <!-- descripiton -->
+                                <div class="ml-2 flex flex-col">
+                                    <span class="font-semibold">{{ contacts[index].name }}</span>
+                                    <span class="text-slate-500">{{ }}</span>
+                                </div>
+                            </li>
+                        </template>
+
+                    </ul>
+                </div>
+
+
+
+
+            </div>
+            <!-- center section -->
+            <div class="w-2/4 h-screen flex-col border-r">
+                <!-- profile info -->
+                <header class="h-[70px] p-2.5 flex items-center shadow-md">
+                    <!-- profile img -->
+                    <!--  -->
+                    <img class="w-12 h-12 ml-4 flex-col rounded-full" :src="getProfilePicture(activeChat)" alt="">
+
+                    <div class=" ml-4 flex-col">
+                        <div class="font-bold">{{ contacts[activeChat].name }}</div>
+                        <div class="text-slate-500">Last seen recently</div>
+                    </div>
+                </header>
+
+                <div class="w-full h-[calc(100vh-140px)] p-4 flex flex-col gap-2 bg-sky-300 overflow-y-auto">
+
+                    <template v-for="singleMessage, index in contacts[activeChat].messages">
+                        <!-- bubble chat -->
+                        <div :class="{'mr-auto bg-green-300': singleMessage.status == 'sent', 'ml-auto bg-white': singleMessage.status == 'received'}"
+                            class="max-w-[50%] p-2 rounded-xl rounded-bl-none">
+                            <div class="">{{singleMessage.message }}</div>
+                            <div class="text-[12px] font-semibold text-slate-500">{{ singleMessage.date }}</div>
+                        </div>
+                    </template>
+
+                </div>
+
+                <footer class=" w-full h-[70px] py-6 flex items-center justify-center bg-sky-300">
+                    <!-- text input -->
+                    <div class="w-4/5 h-[50px] flex justify-between items-center bg-white rounded-lg">
+                        <i class="p-4 text-[24px] text-slate-500 fa-regular fa-face-smile"></i>
+                        <input v-model="userInput" class="w-full" type="text" name="" id="" placeholder="Message">
+                    </div>
+                    <div class="w-12 h-12 ml-2 flex items-center justify-center bg-white rounded-full">
+                        <i class="text-slate-500 fa-solid fa-microphone"></i>
+                    </div>
+                </footer>
+
+
+
+            </div>
+            <!-- right section -->
+            <div></div>
+        </div>
+
+    </div>
+
+    <!-- scripts -->
+    <script src='https://unpkg.com/vue@3/dist/vue.global.js'></script>
+    <script src="./assets/js/main.js"></script>
+</body>
+
+</html>
