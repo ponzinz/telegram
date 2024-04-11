@@ -20,8 +20,10 @@
 
         <!-- main container -->
         <div class="w-screen h-screen flex">
+
             <!-- left section -->
             <div class="w-1/4 border-r">
+
                 <div class="h-28">
                     <!-- search section -->
                     <div class="w-full p-4 flex items-center">
@@ -38,58 +40,68 @@
                                 </svg>
 
                             </div>
+
                             <input type="search" id="default-search"
                                 class="w-full p-2 ps-10 text-sm bg-slate-100 rounded-3xl text-gray-700 placeholder:text-gray-300 placeholder:font-semibold"
                                 placeholder="Search..." />
                         </div>
+
                     </div>
 
                     <!-- chat folders -->
                     <div class="shadow-md">
                         <ul @wheel="horizontalScroll($event)" class="ml-2 flex items-center overflow-x-auto overflow-y-hidden whitespace-nowrap
                         no-scrollbar font-semibold snap-x">
+
                             <li class="p-2 snap-start">
                                 <a href="#">
                                     <span class="text-gray-500">All</span>
                                     <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">61</span>
                                 </a>
                             </li>
+
                             <li class="ml- p-2 snap-start">
                                 <a href="#">
                                     <span class="text-gray-500">Home</span>
                                     <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">5</span>
                                 </a>
                             </li>
+
                             <li class="ml- p-2 snap-start">
                                 <a href="#">
                                     <span class="text-gray-500">People</span>
                                     <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">8</span>
                                 </a>
                             </li>
+
                             <li class="ml- p-2 snap-start">
                                 <a href="#">
                                     <span class="text-gray-500">News</span>
                                     <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">3</span>
                                 </a>
                             </li>
+
                             <li class="ml- p-2 snap-start">
                                 <a href="#">
                                     <span class="text-gray-500">Meme</span>
                                     <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">24</span>
                                 </a>
                             </li>
+
                             <li class="ml- p-2 snap-start">
                                 <a href="#">
                                     <span class="text-gray-500">Geopolitics</span>
                                     <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">17</span>
                                 </a>
                             </li>
+
                             <li class="ml- p-2 snap-start">
                                 <a href="#">
                                     <span class="text-gray-500">Utils</span>
                                     <span class="ml-1 px-2 py-0.5 text-sm text-white bg-gray-300 rounded-full">4</span>
                                 </a>
                             </li>
+
                         </ul>
                     </div>
                 </div>
@@ -100,13 +112,20 @@
                     <ul class="p-4 flex flex-col gap-4 ">
 
                         <template v-for="contact, index in contacts">
-                            <li @click="showCurrentChat(index)" class="flex items-center cursor-pointer">
+                            <li @click="showCurrentChat(index)"
+                                :class="[{'bg-sky-500 hover:bg-sky-500': index === activeChat}, contact.visible == true ? 'flex' : 'hidden']"
+                                class="p-2 flex items-center relative cursor-pointer hover:bg-slate-100 rounded-md">
                                 <!-- profile img -->
-                                <img class="w-12 h-12 rounded-full" :src="getProfilePicture(index)" alt="">
+                                <img class="w-14 h-14 rounded-full" :src="getProfilePicture(index)"
+                                    alt="Profile picture">
                                 <!-- descripiton -->
                                 <div class="ml-2 flex flex-col">
                                     <span class="font-semibold">{{ contacts[index].name }}</span>
-                                    <span class="text-slate-500">{{ }}</span>
+                                    <span class="text-slate-500">{{
+                                        contact.messages[contact.messages.length-1].message}}</span>
+                                </div>
+                                <div class="absolute right-2 text-slate-400">
+                                    <span>11.11</span>
                                 </div>
                             </li>
                         </template>
@@ -121,14 +140,15 @@
             <!-- center section -->
             <div class="w-2/4 h-screen flex-col border-r">
                 <!-- profile info -->
-                <header class="h-[70px] p-2.5 flex items-center shadow-md">
-                    <!-- profile img -->
-                    <!--  -->
-                    <img class="w-12 h-12 ml-4 flex-col rounded-full" :src="getProfilePicture(activeChat)" alt="">
+                <header class="">
+                    <div class="p-2.5 flex items-center shadow-lg z-auto">
+                        <!-- profile img -->
+                        <img class="w-12 h-12 ml-4 flex-col rounded-full" :src="getProfilePicture(activeChat)" alt="">
 
-                    <div class=" ml-4 flex-col">
-                        <div class="font-bold">{{ contacts[activeChat].name }}</div>
-                        <div class="text-slate-500">Last seen recently</div>
+                        <div class=" ml-4 flex-col">
+                            <div class="font-bold">{{ contacts[activeChat].name }}</div>
+                            <div class="text-slate-500">Last seen recently</div>
+                        </div>
                     </div>
                 </header>
 
@@ -136,8 +156,8 @@
 
                     <template v-for="singleMessage, index in contacts[activeChat].messages">
                         <!-- bubble chat -->
-                        <div :class="{'mr-auto bg-green-300': singleMessage.status == 'sent', 'ml-auto bg-white': singleMessage.status == 'received'}"
-                            class="max-w-[50%] p-2 rounded-xl rounded-bl-none">
+                        <div :class="{'mr-auto bg-white rounded-bl-none': singleMessage.status == 'received', 'ml-auto bg-green-300 rounded-br-none': singleMessage.status == 'sent'}"
+                            class="max-w-[50%] p-2 rounded-xl">
                             <div class="">{{singleMessage.message }}</div>
                             <div class="text-[12px] font-semibold text-slate-500">{{ singleMessage.date }}</div>
                         </div>
@@ -146,14 +166,20 @@
                 </div>
 
                 <footer class=" w-full h-[70px] py-6 flex items-center justify-center bg-sky-300">
+
                     <!-- text input -->
                     <div class="w-4/5 h-[50px] flex justify-between items-center bg-white rounded-lg">
+
                         <i class="p-4 text-[24px] text-slate-500 fa-regular fa-face-smile"></i>
-                        <input v-model="userInput" class="w-full" type="text" name="" id="" placeholder="Message">
+                        <input v-model="userInput" @keyup.enter="printMessage(activeChat)" class="w-full" type="text"
+                            name="" id="" placeholder="Message">
+
                     </div>
+
                     <div class="w-12 h-12 ml-2 flex items-center justify-center bg-white rounded-full">
                         <i class="text-slate-500 fa-solid fa-microphone"></i>
                     </div>
+
                 </footer>
 
 

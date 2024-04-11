@@ -7,7 +7,7 @@
 //* - [✔] Click sul contatto mostra la conversazione del contatto cliccato
 
 // Milestone 3
-// - Aggiunta di un messaggio: l’utente scrive un testo nella parte bassa e digitando “enter” il testo viene aggiunto al thread sopra, come messaggio verde
+//* - [✔] Aggiunta di un messaggio: l’utente scrive un testo nella parte bassa e digitando “enter” il testo viene aggiunto al thread sopra, come messaggio verde
 // - Risposta dall’interlocutore: ad ogni inserimento di un messaggio, l’utente riceverà un “ok” come risposta, che apparirà dopo 1 secondo.
 
 // Milestone 4
@@ -105,7 +105,8 @@ createApp({
             },
             ],
             activeChat: 0,
-            activeMessage: null
+            activeMessage: null,
+            userInput: ''
         };
     },
     methods: {
@@ -123,12 +124,16 @@ createApp({
         },
         printMessage(activeChat) {
             const newMessage = {
-                date: '09/04/2024',
-                message: this.userInput
+                date: '10/01/2020 15:50:00',
+                message: this.userInput,
+                status: 'sent'
+            };
+            if (this.userInput.length > 0) {
+                this.contacts[activeChat].messages.push(newMessage);
+                this.userInput = ''
             }
-        }
+        },
     },
     mounted() {
-        console.log(activeChat[index])
     },
 }).mount('#app');
