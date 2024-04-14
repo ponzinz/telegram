@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- luxon -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+
     <!-- font awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
@@ -22,7 +25,7 @@
         <div class="w-screen h-screen flex">
 
             <!-- left section -->
-            <div class="w-1/4 border-r">
+            <div :class="[arrow === true ? 'block w-full md:w-1/4': 'hidden'], " class="w-1/4 md:block border-r">
 
                 <div class="h-28">
                     <!-- search section -->
@@ -41,8 +44,8 @@
 
                             </div>
 
-                            <input type="search" id="default-search"
-                                class="w-full p-2 ps-10 text-sm bg-slate-100 rounded-3xl text-gray-700 placeholder:text-gray-300 placeholder:font-semibold"
+                            <input v-model="contactSearch" @keyup="searchContact()" type="search" id="default-search"
+                                class="w-full p-2 ps-10 text-sm bg-slate-100 rounded-3xl outline-none focus:outline-sky-500 text-gray-700 placeholder:text-gray-300 placeholder:font-semibold"
                                 placeholder="Search..." />
                         </div>
 
@@ -109,23 +112,25 @@
                 <!-- chat container -->
                 <div class="h-[calc(100vh-7rem)] overflow-y-auto">
                     <!-- chats -->
-                    <ul class="p-4 flex flex-col gap-4 ">
+                    <ul class="p-4 flex flex-col gap-0 ">
 
                         <template v-for="contact, index in contacts">
                             <li @click="showCurrentChat(index)"
-                                :class="[{'bg-sky-500 hover:bg-sky-500': index === activeChat}, contact.visible == true ? 'flex' : 'hidden']"
-                                class="p-2 flex items-center relative cursor-pointer hover:bg-slate-100 rounded-md">
+                                :class="[contact.visible == true ? 'flex' : 'hidden'], [index===activeChat ? 'bg-[#3390ec] hover:bg-[#3390ec]' :  'hover:bg-slate-100']"
+                                class="p-2 flex items-center relative cursor-pointer rounded-md">
                                 <!-- profile img -->
                                 <img class="w-14 h-14 rounded-full" :src="getProfilePicture(index)"
                                     alt="Profile picture">
                                 <!-- descripiton -->
-                                <div class="ml-2 flex flex-col">
-                                    <span class="font-semibold">{{ contacts[index].name }}</span>
-                                    <span class="text-slate-500">{{
-                                        contact.messages[contact.messages.length-1].message}}</span>
-                                </div>
-                                <div class="absolute right-2 text-slate-400">
-                                    <span>11.11</span>
+                                <div class="flex">
+                                    <div class="ml-2 flex flex-col">
+                                        <span class="font-semibold">{{ contacts[index].name }}</span>
+                                        <span class="lg:block hidden text-gray-500">{{
+                                            contact.messages[contact.messages.length-1].message}}</span>
+                                    </div>
+                                    <div class="absolute right-2 text-gray-500">
+                                        <span>11.11</span>
+                                    </div>
                                 </div>
                             </li>
                         </template>
@@ -138,10 +143,13 @@
 
             </div>
             <!-- center section -->
-            <div class="w-2/4 h-screen flex-col border-r">
+            <div :class="[arrow === true ? 'hidden' : 'block']" class="w-full md:block h-screen flex-col border-r">
                 <!-- profile info -->
-                <header class="">
-                    <div class="p-2.5 flex items-center shadow-lg z-auto">
+                <header class="flex shadow-md items-center">
+                    <div class="md:hidden block text-[32px] text-gray-500">
+                        <i @click="arrowBack()" class="pl-4 fa-solid fa-arrow-left cursor-pointer"></i>
+                    </div>
+                    <div class="p-2.5 flex items-center z-auto">
                         <!-- profile img -->
                         <img class="w-12 h-12 ml-4 flex-col rounded-full" :src="getProfilePicture(activeChat)" alt="">
 
@@ -152,27 +160,71 @@
                     </div>
                 </header>
 
-                <div class="w-full h-[calc(100vh-140px)] p-4 flex flex-col gap-2 bg-sky-300 overflow-y-auto">
+                <div style="background-image: url(./assets/img/wallpaper.jpg);"
+                    class="w-full h-[calc(100vh-140px)] p-4 flex flex-col gap-2 text-wrap overflow-y-auto">
 
                     <template v-for="singleMessage, index in contacts[activeChat].messages">
                         <!-- bubble chat -->
                         <div :class="{'mr-auto bg-white rounded-bl-none': singleMessage.status == 'received', 'ml-auto bg-green-300 rounded-br-none': singleMessage.status == 'sent'}"
-                            class="max-w-[50%] p-2 rounded-xl">
-                            <div class="">{{singleMessage.message }}</div>
-                            <div class="text-[12px] font-semibold text-slate-500">{{ singleMessage.date }}</div>
+                            class="max-w-[50%] p-2 flex flex-col relative rounded-xl">
+                            <div class="absolute top-1 right-2 text-xs">
+                                <i @click="activateDropdown(singleMessage, index)"
+                                    class="fa-solid fa-chevron-down cursor-pointer"></i>
+                            </div>
+
+                            <div class="pr-[18px] break-words">{{singleMessage.message }}</div>
+                            <div class="text-[12px] ml-auto font-semibold text-slate-500">{{ singleMessage.date }}</div>
+
+                            <div v-if="activeMessage === index"
+                                class="min-w-56 p-2 flex flex-col gap-0 absolute top-5 font-semibold border-slate-500 bg-white/70 backdrop-blur-md rounded-md z-10">
+
+                                <div class="p-2 flex items-center cursor-pointer hover:bg-white/70 hover:rounded-md ">
+                                    <i class="mr-4 text-sm fa-solid fa-reply"></i>
+                                    <span>Reply</span>
+                                </div>
+
+                                <div class="p-2 flex items-center cursor-pointer hover:bg-white/70 hover:rounded-md">
+                                    <i class="mr-4 text-sm fa-solid fa-copy"></i>
+                                    <span>Copy text</span>
+                                </div>
+
+                                <div class="p-2 flex items-center cursor-pointer hover:bg-white/70 hover:rounded-md">
+                                    <i class="mr-4 text-sm fa-solid fa-thumbtack"></i>
+                                    <span>Pin</span>
+                                </div>
+
+                                <div class="p-2 flex items-center cursor-pointer hover:bg-white/70 hover:rounded-md">
+                                    <i class="mr-4 text-sm fa-solid fa-share"></i>
+                                    <span>Forward</span>
+                                </div>
+
+                                <div class="p-2 flex items-center cursor-pointer hover:bg-white/70 hover:rounded-md">
+                                    <i class="mr-4 text-sm fa-regular fa-circle-check"></i>
+                                    <span>Select</span>
+                                </div>
+
+                                <div @click="deleteMessage(index)"
+                                    class="p-2 flex items-center text-red-500 cursor-pointer hover:bg-slate-50/80 hover:rounded-md">
+                                    <i class="mr-4 text-sm fa-solid fa-trash"></i>
+                                    <span>Delete</span>
+                                </div>
+                            </div>
                         </div>
                     </template>
 
+
+
                 </div>
 
-                <footer class=" w-full h-[70px] py-6 flex items-center justify-center bg-sky-300">
+                <footer style="background-image: url(./assets/img/wallpaper.jpg)"
+                    class=" w-full h-[70px] py-6 flex items-center justify-center bg-sky-300">
 
                     <!-- text input -->
                     <div class="w-4/5 h-[50px] flex justify-between items-center bg-white rounded-lg">
 
                         <i class="p-4 text-[24px] text-slate-500 fa-regular fa-face-smile"></i>
-                        <input v-model="userInput" @keyup.enter="printMessage(activeChat)" class="w-full" type="text"
-                            name="" id="" placeholder="Message">
+                        <input v-model="userInput" @keyup.enter="printMessage(activeChat)" class="w-full outline-none"
+                            type="text" name="" id="" placeholder="Message">
 
                     </div>
 
@@ -185,15 +237,11 @@
 
 
             </div>
-            <!-- right section -->
-            <div></div>
         </div>
 
-    </div>
-
-    <!-- scripts -->
-    <script src='https://unpkg.com/vue@3/dist/vue.global.js'></script>
-    <script src="./assets/js/main.js"></script>
+        <!-- scripts -->
+        <script src='https://unpkg.com/vue@3/dist/vue.global.js'></script>
+        <script src="./assets/js/main.js"></script>
 </body>
 
 </html>

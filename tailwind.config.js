@@ -5,7 +5,11 @@ module.exports = {
     "./src/**/*.{html,js}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'chatWallpaper': "url('./assets/img/wallpaper.jpg')"
+      }
+    },
   },
   plugins: [
     function ({ addUtilities }) {

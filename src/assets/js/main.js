@@ -8,19 +8,19 @@
 
 // Milestone 3
 //* - [✔] Aggiunta di un messaggio: l’utente scrive un testo nella parte bassa e digitando “enter” il testo viene aggiunto al thread sopra, come messaggio verde
-// - Risposta dall’interlocutore: ad ogni inserimento di un messaggio, l’utente riceverà un “ok” come risposta, che apparirà dopo 1 secondo.
+//* - [✔] Risposta dall’interlocutore: ad ogni inserimento di un messaggio, l’utente riceverà un “ok” come risposta, che apparirà dopo 1 secondo.
 
 // Milestone 4
-// - Ricerca utenti: scrivendo qualcosa nell’input a sinistra, vengono visualizzati solo i contatti il cui nome contiene le lettere inserite (es, Marco, Matteo Martina -> Scrivo “mar” rimangono solo Marco e Martina)
+//* - [✔] Ricerca utenti: scrivendo qualcosa nell’input a sinistra, vengono visualizzati solo i contatti il cui nome contiene le lettere inserite (es, Marco, Matteo Martina -> Scrivo “mar” rimangono solo Marco e Martina)
 
 // BONUS:
 
 // Milestone 5
-// - Cancella messaggio: cliccando sul messaggio appare un menu a tendina che permette di cancellare il messaggio selezionato
+//* - [✔] Cancella messaggio: cliccando sul messaggio appare un menu a tendina che permette di cancellare il messaggio selezionato
 // - Visualizzazione ora e ultimo messaggio inviato/ricevuto nella lista dei contatti
 
 const { createApp } = Vue;
-
+const DateTime = luxon.DateTime;
 createApp({
     data() {
         return {
@@ -106,7 +106,9 @@ createApp({
             ],
             activeChat: 0,
             activeMessage: null,
-            userInput: ''
+            userInput: '',
+            contactSearch: '',
+            arrow: false
         };
     },
     methods: {
@@ -121,18 +123,49 @@ createApp({
         },
         showCurrentChat(clickedIndex) {
             this.activeChat = clickedIndex;
+            this.activeMessage = null;
+            this.arrow = false;
+        },
+        arrowBack() {
+            this.arrow = true;
         },
         printMessage(activeChat) {
             const newMessage = {
-                date: '10/01/2020 15:50:00',
+                date: DateTime.now().setLocale('fr').toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
                 message: this.userInput,
                 status: 'sent'
             };
             if (this.userInput.length > 0) {
                 this.contacts[activeChat].messages.push(newMessage);
                 this.userInput = ''
+                this.sendReply = setTimeout(() => { this.letContactReply(activeChat); }, 1000);
             }
         },
+        letContactReply(activeChat) {
+            reply = {
+                date: DateTime.now().setLocale('fr').toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
+                message: 'I can\'t read your message 😯',
+                status: 'received'
+            },
+                this.contacts[activeChat].messages.push(reply);
+        },
+        searchContact() {
+            this.contacts.forEach((name, index) => {
+                if (!this.contacts[index].name.toLowerCase().includes(this.contactSearch.toLowerCase())) {
+                    this.contacts[index].visible = false;
+                } else {
+                    this.contacts[index].visible = true;
+                }
+            });
+        },
+        activateDropdown(singleMessage, clickedIndex) {
+            this.activeMessage = (this.activeMessage === clickedIndex) ? null : clickedIndex;
+        },
+        deleteMessage(clickedIndex) {
+            this.contacts[this.activeChat].messages.splice(clickedIndex, 1);
+            this.activeMessage = null;
+        }
+
     },
     mounted() {
     },
